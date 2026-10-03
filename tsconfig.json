@@ -1,0 +1,15 @@
+{
+  // core · bridge 는 앱이 소스로 import 한다. 앱에는 DOM 타입이 없으므로 여기서도 DOM 없이 검사한다.
+  "compilerOptions": {
+    "target": "esnext",
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "lib": ["es2022"],
+    "strict": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    "types": []
+  },
+  "include": ["src/core", "src/bridge"]
+}

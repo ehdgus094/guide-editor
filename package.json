@@ -1,0 +1,50 @@
+{
+  "name": "@ehdgus094/guide-editor",
+  "version": "0.1.0",
+  "private": true,
+  "description": "사진 · 주의 상자가 들어가는 가이드 문서 편집기 — Tiptap 웹과 10tap React Native 앱이 함께 쓴다",
+  "license": "UNLICENSED",
+  "type": "module",
+  "exports": {
+    "./core": "./src/core/index.ts",
+    "./bridge": "./src/bridge/index.ts",
+    "./webview": {
+      "types": "./dist/webview.d.ts",
+      "default": "./dist/webview.js"
+    }
+  },
+  "files": [
+    "src/core",
+    "src/bridge",
+    "dist/webview.js",
+    "dist/webview.d.ts"
+  ],
+  "scripts": {
+    "build": "vite build && node scripts/wrap-html.mjs",
+    "prepare": "npm run build",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p src/webview"
+  },
+  "peerDependencies": {
+    "@10play/tentap-editor": "^1.0.1",
+    "@tiptap/core": "^3.11.0",
+    "@tiptap/extensions": "^3.11.0",
+    "@tiptap/pm": "^3.11.0"
+  },
+  "peerDependenciesMeta": {
+    "@10play/tentap-editor": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@10play/tentap-editor": "1.0.1",
+    "@tiptap/react": "3.31.4",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "typescript": "5.9.3",
+    "vite": "8.3.2",
+    "vite-plugin-singlefile": "2.3.3"
+  }
+}
