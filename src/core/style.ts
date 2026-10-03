@@ -78,5 +78,8 @@ export const guideDocumentCss = ({
   figure[data-size="oneThird"] img { width: 33.3333%; }
   figure[data-align="left"] img { margin-left: 0; }
   figure[data-align="right"] img { margin-right: 0; }
-  figure.ProseMirror-selectednode img { outline: 3px solid ${colors.brand}; }
+  /* 읽기 전용에서도 사진을 누르면 노드 선택이 된다. 테두리는 편집할 때만 그린다 */
+  .ProseMirror[contenteditable="true"] figure.ProseMirror-selectednode img {
+    outline: 3px solid ${colors.brand};
+  }
 `;
