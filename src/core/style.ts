@@ -55,6 +55,10 @@ export const guideDocumentCss = ({
   .ProseMirror h6 { font-size: ${fontSize.caption}px; font-weight: 700; }
   .ProseMirror > :first-child { margin-top: 0; }
   .ProseMirror ul, .ProseMirror ol { margin: 0 0 8px; padding-left: 20px; }
+  .ProseMirror ul { list-style: disc; }
+  .ProseMirror :is(ul, ol) ul { list-style: circle; }
+  .ProseMirror :is(ul, ol) :is(ul, ol) ul { list-style: square; }
+  .ProseMirror ol { list-style: decimal; }
   .ProseMirror li p { margin: 0 0 4px; }
   .ProseMirror mark { background-color: ${colors.highlight}; color: inherit; }
   .ProseMirror blockquote {
