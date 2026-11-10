@@ -1,5 +1,6 @@
 import { Extension, Node } from '@tiptap/core';
-import { Plugin } from '@tiptap/pm/state';
+import { Plugin, TextSelection } from '@tiptap/pm/state';
+import type { EditorState, Transaction } from '@tiptap/pm/state';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
 
 /**
@@ -163,6 +164,67 @@ export const GuideListDepth = Extension.create({
           deepestList(transaction.doc) <= GUIDE_LIMITS.listDepth,
       }),
     ];
+  },
+});
+
+/**
+ * 목록 바로 뒤 블록의 맨 앞에서 지우면 그 블록의 글을 목록 마지막 항목의 끝에 잇는다. 커서는 이은
+ * 자리에 선다.
+ *
+ * 기본 동작에 맡기면 그 블록이 **새 항목으로 싸여** 목록 끝에 붙는다 — 목록 항목이 문단 하나만 담게
+ * 좁혀져 있어(`GUIDE_CONTENT.listItem`) 앞 항목 안으로 들어가지 못하고, ProseMirror 가 그다음 수단으로
+ * 감싸서 합친다.
+ */
+export const joinIntoListBefore = (
+  state: EditorState,
+  dispatch?: (transaction: Transaction) => void,
+) => {
+  const { $from, empty } = state.selection;
+  if (!empty || $from.parentOffset !== 0 || !$from.parent.isTextblock) {
+    return false;
+  }
+  const depth = $from.depth;
+  const index = $from.index(depth - 1);
+  const before = index > 0 ? $from.node(depth - 1).child(index - 1) : null;
+  if (!before || !LIST_TYPES.includes(before.type.name)) {
+    return false;
+  }
+  // 마지막 항목이 하위 목록을 가지면 눈에 보이는 마지막 줄은 그 안에 있다 — 끝까지 내려간다
+  let end = $from.before(depth) - 1;
+  let last = before.lastChild;
+  while (last && last.type.name !== 'paragraph') {
+    end -= 1;
+    last = last.lastChild;
+  }
+  if (!last) {
+    return false;
+  }
+  // 그 문단 안의 끝
+  end -= 1;
+  if (dispatch) {
+    const transaction = state.tr
+      .delete($from.before(depth), $from.after(depth))
+      .insert(end, $from.parent.content);
+    dispatch(
+      transaction
+        .setSelection(TextSelection.create(transaction.doc, end))
+        .scrollIntoView(),
+    );
+  }
+  return true;
+};
+
+/** 목록 뒤에서 지우는 키를 `joinIntoListBefore` 로 잇는다. Tiptap 의 목록 키맵보다 먼저 받는다 */
+export const GuideListJoin = Extension.create({
+  name: 'guideListJoin',
+  priority: 1000,
+  addKeyboardShortcuts() {
+    return {
+      Backspace: () =>
+        this.editor.commands.command(({ state, dispatch }) =>
+          joinIntoListBefore(state, dispatch),
+        ),
+    };
   },
 });
 

@@ -10,9 +10,11 @@ export {
   GuideCallout,
   GuideImage,
   GuideListDepth,
+  GuideListJoin,
   GuideTextAlign,
   IMAGE_SIZES,
   deepestList,
+  joinIntoListBefore,
   oneOf,
 } from './schema';
 export type { Align, ImageSize } from './schema';
