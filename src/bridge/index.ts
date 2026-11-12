@@ -33,6 +33,7 @@ import {
   GuideImage,
   GuideListDepth,
   GuideListJoin,
+  GuideListNumber,
   GuideTextAlign,
   IMAGE_SIZES,
   oneOf,
@@ -314,6 +315,7 @@ export const GuideBridge = new BridgeExtension<
     GuideCallout,
     GuideListDepth,
     GuideListJoin,
+    GuideListNumber,
     GuideTouch,
   ],
   onBridgeMessage: (editor, message) => {

@@ -11,10 +11,12 @@ export {
   GuideImage,
   GuideListDepth,
   GuideListJoin,
+  GuideListNumber,
   GuideTextAlign,
   IMAGE_SIZES,
   deepestList,
   joinIntoListBefore,
+  listNumberDigits,
   oneOf,
 } from './schema';
 export type { Align, ImageSize } from './schema';

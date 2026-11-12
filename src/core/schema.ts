@@ -2,6 +2,7 @@ import { Extension, Node } from '@tiptap/core';
 import { Plugin, TextSelection } from '@tiptap/pm/state';
 import type { EditorState, Transaction } from '@tiptap/pm/state';
 import type { Node as ProseMirrorNode } from '@tiptap/pm/model';
+import { Decoration, DecorationSet } from '@tiptap/pm/view';
 
 /**
  * 가이드 문서의 모양. **서버가 받는 노드 · 속성이 정본이다** — README 의 "문서 모양" 표. 여기 있는
@@ -162,6 +163,53 @@ export const GuideListDepth = Extension.create({
         filterTransaction: transaction =>
           !transaction.docChanged ||
           deepestList(transaction.doc) <= GUIDE_LIMITS.listDepth,
+      }),
+    ];
+  },
+});
+
+/** 번호 목록에서 가장 큰 번호의 자릿수 — 시작 번호와 항목 수가 정한다 */
+export const listNumberDigits = (list: ProseMirrorNode) =>
+  String((Number(list.attrs.start) || 1) + list.childCount - 1).length;
+
+const listNumberDecorations = (doc: ProseMirrorNode) => {
+  const decorations: Decoration[] = [];
+  doc.descendants((node, position) => {
+    if (node.type.name === 'orderedList') {
+      decorations.push(
+        Decoration.node(position, position + node.nodeSize, {
+          style: `--guide-list-digits: ${listNumberDigits(node)}`,
+        }),
+      );
+    }
+    // 목록은 글 블록 안에 없다
+    return !node.isTextblock;
+  });
+  return DecorationSet.create(doc, decorations);
+};
+
+/**
+ * 번호 목록마다 가장 큰 번호의 자릿수를 CSS 변수(`--guide-list-digits`)로 단다. 문서 CSS 가 그 값으로
+ * 번호가 설 여백을 잡는다 — 번호는 글 왼쪽 밖에 서므로, 여백이 번호보다 좁으면 문서 밖으로 나가 문서를
+ * 담은 칸에 잘린다. 자릿수는 문서에서 나오는 값이라 읽기 전용에서도 같다.
+ */
+export const GuideListNumber = Extension.create({
+  name: 'guideListNumber',
+  addProseMirrorPlugins() {
+    return [
+      new Plugin<DecorationSet>({
+        state: {
+          init: (_, { doc }) => listNumberDecorations(doc),
+          apply: (transaction, decorations) =>
+            transaction.docChanged
+              ? listNumberDecorations(transaction.doc)
+              : decorations,
+        },
+        props: {
+          decorations(state) {
+            return this.getState(state);
+          },
+        },
       }),
     ];
   },

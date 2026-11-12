@@ -21,7 +21,7 @@
 
 | import | 무엇 | 누가 |
 |---|---|---|
-| `@ehdgus094/guide-editor/core` | 스키마와 확장(사진 · 주의 상자 · 정렬 · 목록 깊이), 문서 CSS(`guideDocumentCss`), 서버 모양 변환(`toServerDoc` · `fromServerDoc` · `measureDoc` · `replaceImageKeys`), 한도(`GUIDE_LIMITS`) | 웹 · 앱 |
+| `@ehdgus094/guide-editor/core` | 스키마와 확장(사진 · 주의 상자 · 정렬 · 목록 깊이 · 번호 목록의 자릿수), 문서 CSS(`guideDocumentCss`), 서버 모양 변환(`toServerDoc` · `fromServerDoc` · `measureDoc` · `replaceImageKeys`), 한도(`GUIDE_LIMITS`) | 웹 · 앱 |
 | `@ehdgus094/guide-editor/bridge` | 10tap 연결 — `GUIDE_BRIDGES` 와 사진 넣기 · 블록 옮기기 · 크기 · 정렬 · 한글 조합을 끝내고 서식 바꾸기 명령, 툴바가 읽을 상태 | 앱 |
 | `@ehdgus094/guide-editor/webview` | 앱 WebView 에 띄울 페이지(`editorHtml`). 편집과 읽기 전용이 같은 페이지다 | 앱 |
 
@@ -48,6 +48,10 @@ useEditorBridge({ customSource: editorHtml, bridgeExtensions: bridges, initialCo
 
 읽기 전용은 같은 페이지에 `editable: false` · `dynamicHeight: true` 를 준다.
 
+**문서의 여백은 `theme.padding` 으로 넘기고, 문서를 담는 칸에는 여백을 두지 않는다.** 문서는 글 상자
+밖에도 그린다 — 목록의 머리, 기울인 글자의 끝. 여백이 문서 안에 있어야 그것들이 칸의 가장자리에 잘리지
+않는다. 카드 안에 띄울 때는 문서 칸을 카드의 가로 여백만큼 넓혀 카드 가장자리에 닿게 한다.
+
 ### 웹 (Tiptap 을 바로 쓴다)
 
 `core` 의 확장을 Tiptap 기본 확장과 함께 넣는다. 기본 확장 중 서버보다 넓게 받는 둘은 좁힌다.
@@ -57,6 +61,9 @@ Blockquote.extend(GUIDE_CONTENT.blockquote);
 ListItem.extend(GUIDE_CONTENT.listItem);
 Highlight.configure(GUIDE_HIGHLIGHT);
 ```
+
+**`GuideListNumber` 를 빼면 두 자리 넘는 번호가 문서 밖으로 나간다.** 번호 목록의 여백은 가장 큰 번호의
+자릿수를 따라 넓어지는데, 그 자릿수를 이 확장이 목록마다 단다 — 읽기 전용 편집기에도 넣는다.
 
 저장할 때는 늘 `toServerDoc` 을 거친다 — 번호 목록의 `type` 과 사진의 `src` 가 빠진다.
 
